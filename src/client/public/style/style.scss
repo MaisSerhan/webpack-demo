@@ -1,0 +1,61 @@
+@import "./breakPoints";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-attachment: fixed;
+  background-color: #fdc5c5;
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: "REM", sans-serif;
+
+
+  .container {
+    min-height: 88vh;
+    .site-header {
+    background-color: #fff8f8;
+    color: #080606;
+    padding: 36px 0;
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+
+      .site-title {
+        font-size: 23px;
+        @include respond-to("sm"){
+          font-size: 48px;
+        }
+        margin: 0;
+        text-align: center;
+        text-transform: uppercase;
+      }
+    }
+
+    #form_row {
+      width: 90%;
+      @include respond-to("lg") {
+        width: 50%;
+      }
+      #city_error{
+        display: none;
+      }
+      #date_error{
+        display: none;
+      }
+    }
+  }
+ #form_row img{
+  width: 329px;
+  height: 203px;
+  }
+  footer{
+    background-color: #e2e2e2;
+    justify-content: space-evenly;
+    display: flex;
+    padding: 50px 0;
+  }
+}
+
