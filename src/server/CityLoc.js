@@ -2,7 +2,7 @@
 //use the geonames API for the travel data and city
 const axios = require("axios")
 //https://secure.geonames.org/searchJSON?q=Andorra&maxRows=1&username=maissarhan
-const getCityLoc = async(city, username) => {
+const CityLoc = async(city, username) => {
     const {data} = await axios.get(`https://secure.geonames.org/searchJSON?q=${city}&maxRows=1&username=${username}`)
     
     if(!data.geonames.length){
@@ -15,4 +15,4 @@ const getCityLoc = async(city, username) => {
     return data.geonames[0]
 }
 
-module.exports =  {getCityLoc}
+module.exports =  {CityLoc}

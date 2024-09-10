@@ -2,7 +2,7 @@
 let axios = require("axios")
 
 //I use th axios to get the data from URL
-const weatherTemp = async(ma, is, days, key) => {
+const weathers = async(ma, is, days, key) => {
     //no day <0 so its not true input
     if(days < 0) {
             const errMsg = {
@@ -38,5 +38,5 @@ const weatherTemp = async(ma, is, days, key) => {
 
 
 module.exports = {
-    weatherTemp
+    weathers
 }

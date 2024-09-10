@@ -51,20 +51,18 @@ The project has the following file structure
 - [result/](result)
 - [src/](src)
     - [client/](src/client)
-        - [public/](src/client/public)
-            - [images/](src/client/public/images)
-            - [styles/](src/client/public/style)
-        - [script/](src/client/script)
-            - [handleForm.js](src/client/script/handleForm.js)
+        - [images/](src/client/images)
+        - [style/](src/client/style)
+        - [js/](src/client/js)
+            - [handleForm.js](src/client/js/handleForm.js)
         - [views/](src/client/views)
             - [index.html](src/client/views/index.html)
         - [index.js](src/client/index.js)
-    
     - [server/ ](src/server)
-        - [getCityLoc.js](src/server/getCityLoc.js)
-        - [getCityPic.js](src/server/getCityPic.js)
+        - [CityLoc.js](src/server/CityLoc.js)
+        - [CityPic.js](src/server/CityPic.js)
         - [index.js](src/server/index.js)
-        - [weatherTemp.js](src/server/weatherTemp.js)
+        - [weathers.js](src/server/weathers.js)
 - .babelrc
 - .env
 - .gitignore

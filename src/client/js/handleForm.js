@@ -17,16 +17,16 @@ const handleSubmit = async (e) => {
   e.preventDefault(); // when we input and want to submit
 
   //checking if the function is working fine
-  console.log(" first is true the function is work");
+  console.log("Step 1: The function is triggered successfully");
 
   // validate form on the front-end side which is utterly important before calling the apis for better performance
   if(!valdate_Inp()){
     return;
   };
 
-  console.log("second true validate")
+  console.log("Step 2: Inputs are validated");
   //get the location first and make sure call is successful
-  const Location = await getCityLoc();
+  const Location = await CityLoc();
   //failing call to location
   if (Location && Location.error) {
     //handling the error coming from the server-side
@@ -35,8 +35,9 @@ const handleSubmit = async (e) => {
     return
   } else if (Location && !Location.error) {
 
-    console.log("3. is true location is have in api");
-    //extract longitude and latitude
+    console.log("Step 3: City location is available in API");
+    
+    // Extract latitude, longitude, and city name
     const { lng, lat, name } = await Location;
 
     //get the date of the flight
@@ -55,18 +56,18 @@ const handleSubmit = async (e) => {
       // get remaining days before the flight
       //i need to calcualte remaining days
       const remainingDays = getRdays(date);
-      console.log("4. date is true ")
+      console.log("Step 4: Date is valid");
       //get the weather data and consider sending the remaining days to know when
       //exactly should i get my data back.
 
       const weather = await getWeather(lng, lat, remainingDays);
-      if(weather && weather.error) {
+      if(weather?.error) {
         date_error.innerHTML = `<i class="bi bi-exclamation-circle-fill me-2"></i>${weather.message}`;
         date_error.style.display = "block";
         return;
       }
       //get the picture of the place
-      const pic = await getCityPic(name);
+      const pic = await CityPic(name);
       updateUI(remainingDays, name, pic, weather);
     }
   }
@@ -79,17 +80,17 @@ const valdate_Inp = () => {
   if(!cityInp.value){
     city_error.innerHTML = `<i class="bi bi-exclamation-circle-fill me-2"></i>You need to enter the city`;
     city_error.style.display = "block";
-    return;
+    return false;
   }
   if(!dateInp.value){
     date_error.innerHTML = `<i class="bi bi-exclamation-circle-fill me-2"></i>Please enter the date`;
     date_error.style.display = "block";
-    return;
+    return false;
   }
   if(getRdays(dateInp.value) < 0){
     date_error.innerHTML = `<i class="bi bi-exclamation-circle-fill me-2"></i>Date cannot be in the past`;
     date_error.style.display = "block";
-    return;
+    return false;
   }
   city_error.style.display = "none";
   date_error.style.display = "none";
@@ -97,7 +98,7 @@ const valdate_Inp = () => {
   return true
 };
 
-const getCityLoc = async () => {
+const CityLoc = async () => {
   try{
   if (cityInp.value) {
     const { data } = await axios.post("http://localhost:8000/getCity", form, {
@@ -111,68 +112,52 @@ const getCityLoc = async () => {
     city_error.style.display = "block";
   }}
   catch(error){
-    console.log(error);
+    console.error("Error fetching city location:", error);
   }
 };
 
+// Fetch weather data based on location and remaining days
 const getWeather = async (lng, lat, remainingDays) => {
-  const { data } = await axios.post("http://localhost:8000/getWeather", {
-    lng,
-    lat,
-    remainingDays,
-  });
-
-  return data;
+  try {
+    const { data } = await axios.post("http://localhost:8000/getWeather", { lng, lat, remainingDays });
+    return data;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+  }
+};
+// Calculate remaining days to the flight
+const getRemainingDays = (date) => {
+  const today = new Date();
+  const flightDate = new Date(date);
+  const timeDiff = flightDate - today;
+  return Math.ceil(timeDiff / (1000 * 3600 * 24));
 };
 
-const getRdays = (date) => {
-  // Set the start and end dates
-  const startDate = new Date();
-  const endDate = new Date(date);
-
-  // Calculate the time difference in milliseconds
-  const timeDiff = endDate.getTime() - startDate.getTime();
-
-  // Convert the time difference to days
-  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  // Output the result
-  return daysDiff;
+// Get city picture from the API
+const getCityPicture = async (cityName) => {
+  try {
+    const { data } = await axios.post("http://localhost:8000/CityPic", { city_name: cityName });
+    return data.image;
+  } catch (error) {
+    console.error("Error fetching city picture:", error);
+  }
 };
 
-//getting the city picture from pixabay
-const getCityPic = async (city_name) => {
-  const { data } = await axios.post("http://localhost:8000/getCityPic", {
-    city_name,
-  });
-  const { image } = await data;
-  return image;
-};
-//Rdays= renmainder day
-const updateUI = (Rdays, city, pic, weather) => {
-  document.querySelector("#Rdays").innerHTML = `
-  Your trip starts in ${Rdays} days from now
-  `;
+// Update the UI with flight and weather information
+const updateUI = (remainingDays, city, picture, weather) => {
+  document.querySelector("#Rdays").innerHTML = `Your trip starts in ${remainingDays} days from now`;
   document.querySelector(".cityName").innerHTML = `Location: ${city}`;
-  document.querySelector(".weather").innerHTML =
-    Rdays > 7
-      ? `Weather is: ${weather.description}`
-      : `Weather is expected to be: ${weather.description}`;
-  document.querySelector(".temp").innerHTML =
-    Rdays > 7
-      ? `Forecast: ${weather.temp}&degC`
-      : `Temperature: ${weather.temp} &deg C`;
-  document.querySelector(".max-temp").innerHTML =
-    Rdays > 7 ? `Max-Temp: ${weather.app_max_temp}&degC` : "";
-  document.querySelector(".min-temp").innerHTML =
-    Rdays > 7 ? `Min-Temp: ${weather.app_min_temp}&degC` : "";
-  document.querySelector(".cityPic").innerHTML = `
-   <image 
-   src="${pic}" 
-   alt="an image that describes the city nature"
-   >
-   `;
+  document.querySelector(".weather").innerHTML = `Weather: ${weather.description}`;
+  document.querySelector(".temp").innerHTML = `Temperature: ${weather.temp}°C`;
+
+  if (remainingDays > 7) {
+    document.querySelector(".max-temp").innerHTML = `Max Temp: ${weather.app_max_temp}°C`;
+    document.querySelector(".min-temp").innerHTML = `Min Temp: ${weather.app_min_temp}°C`;
+  }
+
+  document.querySelector(".cityPic").innerHTML = `<img src="${picture}" alt="City image">`;
   document.querySelector(".flight_data").style.display = "block";
 };
 
-// export the function to show the data to client
+// Export the handleSubmit function for use
 export { handleSubmit };
